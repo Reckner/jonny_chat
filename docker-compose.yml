@@ -1,0 +1,41 @@
+version: '3.3'
+services:
+    jonny_chat:
+        container_name: 'jonny_chat'
+        environment:
+            PORT: '5002'
+            NODE_ENV: 'development'
+            MYSQL_PORT: '3309'
+        build: .
+        ports:
+            - '5002:5002'
+        volumes:
+            - .:/usr/src/app
+        command: node_modules/ts-node/dist/bin.js ./server.ts
+        depends_on:
+            - jonny_chat_db
+    jonny_chat_db:
+        container_name: 'jonny_chat_db'
+        image: mysql:5.7
+        restart: always
+        network_mode: bridge
+        environment:
+            MYSQL_DATABASE: 'db'
+            # So you don't have to use root, but you can if you like
+            MYSQL_USER: 'root'
+            # You can use whatever password you like
+            MYSQL_PASSWORD: 'root'
+            # Password for root access
+            MYSQL_ROOT_PASSWORD: 'root'
+        ports:
+            # <Port exposed> : < MySQL Port running inside container>
+            - 3309:3306
+        expose:
+            # Opens port 3307 on the container
+            - 3306
+            # Where our data will be persisted
+        volumes:
+            - jonny_chat_db:/var/lib/mysql
+    # Names our volume
+volumes:
+    jonny_chat_db:
